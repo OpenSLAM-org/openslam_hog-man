@@ -1,0 +1,160 @@
+/** @page main
+
+<br>
+<h1>Welcome to HOG-Man - Hierarchical Optimization for Pose Graphs on Manifolds</h1>
+
+@section mainpage_modules What is HOG-Man?
+
+HOG-Man is an optimization approach for constraint-network. It provides a
+highly efficient error minimization procedure which applies 
+There is a 2D and a 3D version of HOG-Man available.
+
+@section mainpage_copyright Copyright and License Information
+
+Copyright (C) 2010 G. Grisetti, R. Kümmerle, C. Stachniss
+
+HOG-Man is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+HOG-Man is licensed under the GNU Lesser General Public License 3.0.
+The graph_viewer which is not part of the core algorithm is licensed
+under the GNU General Public License 3.0.
+
+@section mainpage_copyright_external External Software
+Software contained in the folder EXTERNAL
+<ul>
+  <li><a href="http://www.cise.ufl.edu/research/sparse/CSparse/">csparse</a>: Copyright (C) 2006, Timothy A. Davis.</li>
+  <li><a href="http://www.libqglviewer.com/">libQGLViewer</a>: Copyright (C) 2002-2008 Gilles Debunne.</li>
+</ul>
+
+@section mainpage_installsvn Quick Installation Guide (from the repository)
+
+@verbatim
+$ svn co http://www.openslam.org/data/svn/hog-man
+$ cd hog-man/trunk/
+$ bash               # if not already running
+$ source setlibpath
+$ ./configure
+$ make
+@endverbatim
+
+The make process generates a set of shared objects in trunk/lib
+while the binaries are in ./bin.
+When executing the binaries be sure that the environment variable
+LD_LIBRARY_PATH correctly points to your trunk/lib/ directory.
+This is usually achieved by issuing the setlibpath command within trunk/
+like this:
+
+giorgio@brixx:~/hog-man/trunk$ source setlibpath
+
+
+@section mainpage_run2 Guide: Running HOG-Man (2D)
+
+You have the following command line options
+@verbatim
+$ bin/hogman2d 
+*******************************************************************
+*                           HOG-Man v 0.1                         *
+*              (c) Giorgio Grisetti, Rainer Kuemmerle,            *
+*                  Cyrill Stachniss                               *
+*******************************************************************
+
+usage: hogman2d [options] <graph_file> 
+
+options:
+ -hogman | -chol            selects the optimization strategy
+                            between
+                              HOG-Man (default)
+                              cholesky
+ -nomanifold                disables the manifold
+ -i <int>                   sets the maximum number of iterations (default 10)
+ -batch                     if toggled, the file is processed in offline mode
+ -v                         enables the verbose mode of the optimizer
+ -gnuout                    dumps the output to be piped into gnuplot
+ -guess                     perform initial guess (batch mode)
+ -o <filename>              writes in <filename> the optimized graph
+ -h                         this help
+@endverbatim
+
+See data/2D for example graph files.
+
+@subsection mainpage_run2_detail01 Incrementally processing a 2D dataset
+
+@verbatim
+bin/hogman2d file.graph
+@endverbatim
+
+You may use gnuplot to visualize the current state of the optimizer. Additionally, we save the state of the graph to a file.
+@verbatim
+bin/hogman2d -o file-incrementally.graph -gnuout file.graph | gnuplot
+@endverbatim
+
+@subsection mainpage_run2_detail02 Batch optimization of a 2D dataset
+
+To process a dataset offline run
+@verbatim
+bin/hogman2d -gnuout -batch -chol file-incrementally.graph | gnuplot
+@endverbatim
+
+@section mainpage_run3 Guide: Running HOG-Man (3D)
+
+You have the following command line options
+@verbatim
+$ bin/hogman3d -h
+*******************************************************************
+*                           HOG-Man v 0.1                         *
+*              (c) Giorgio Grisetti, Rainer Kuemmerle,            *
+*                  Cyrill Stachniss                               *
+*******************************************************************
+
+usage: hogman3d [options] <graph_file>
+
+options:
+ -hogman | -chol            selects the optimization strategy
+                            between
+                              HOG-Man (default)
+                              cholesky
+ -i <int>                   sets the maximum number of iterations (default 10)
+ -batch                     if toggled, the file is processed in offline mode
+ -v                         enables the verbose mode of the optimizer
+ -guiout                    dumps the output to be piped into graph_viewer
+ -guess                     perform initial guess (batch mode)
+ -o <filename>              writes in <filename> the optimized graph
+ -oc                        overwrite the covariances with the identity
+ -h                         this help
+@endverbatim
+
+@subsection mainpage_run3_detail01 Incrementally processing a 3D dataset
+
+@verbatim
+bin/hogman3d file.graph
+@endverbatim
+
+You may use graph_viewer to visualize the current state of the optimizer. Additionally, we save the state of the graph to a file.
+@verbatim
+bin/hogman3d -o file-incrementally.graph -guiout file.graph | bin/graph_viewer
+@endverbatim
+
+@subsection mainpage_run3_detail02 Batch optimization of a 3D dataset
+
+To process a dataset offline run
+@verbatim
+bin/hogman3d -guiout -batch -chol file-incrementally.graph | bin/graph_viewer
+@endverbatim
+
+
+@section mainpage_further Further Reading
+
+HOG-Man is an implementation of the approach described in:
+
+G. Grisetti, R. Kümmerle, C. Stachniss, U. Frese, and C. Hertzberg.
+Hierarchical Optimization on Manifolds for Online 2D and 3D Mapping.
+In Proc. of the IEEE Int. Conf. on Robotics and Automation (ICRA). Anchorage, AK, USA, May 2010. 
+
+For further details on optimization on manifolds it is highly recommended to read:
+
+C. Hertzberg. A Framework for Sparse, Non-Linear Least Squares Problems on Manifolds.
+Master's thesis, University of Bremen, 2008.
+
+**/

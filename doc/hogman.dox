@@ -1,0 +1,81 @@
+PROJECT_NAME     = HOG-Man
+INPUT            = \
+                   ../aislib/graph_optimizer_hogman/graph_optimizer_chol.h \
+                   ../aislib/graph_optimizer_hogman/csparse_helper.h \
+                   ../aislib/graph_optimizer_hogman/graph_optimizer3d_chol.h \
+                   ../aislib/graph_optimizer_hogman/graph_optimizer2d_chol.h \
+                   ../aislib/graph_optimizer_hogman/graph_optimizer_hchol.h \
+                   ../aislib/graph_optimizer_hogman/graph_optimizer3d_hchol.h \
+                   ../aislib/graph_optimizer_hogman/graph_optimizer2d_hchol.h \
+                   ../aislib/graph/posegraph3d.h \
+                   ../aislib/graph/dijkstra.h \
+                   ../aislib/graph/posegraph2d.h \
+                   ../aislib/graph/loadEdges3d.h \
+                   ../aislib/graph/posegraph.h \
+                   ../aislib/graph/posegraph3d_gradient.h \
+                   ../aislib/graph/graph.h \
+                   ../aislib/graph_optimizer/graph_optimizer2d.h \
+                   ../aislib/graph_optimizer/graph_optimizer2d_aux.h \
+                   ../aislib/graph_optimizer/graph_optimizer3d.h \
+                   ../aislib/graph_optimizer/graph_optimizer.h \
+                   ../aislib/graph_viewer/matrix4x4.h \
+                   ../aislib/graph_viewer/axes.h \
+                   ../aislib/graph_viewer/vrml_output.h \
+                   ../aislib/graph_viewer/standard_camera.h \
+                   ../aislib/graph_viewer/main_widget.h \
+                   ../aislib/graph_viewer/ui_base_main_widget.h \
+                   ../aislib/graph_viewer/pose_graph_vis3d.h \
+                   ../aislib/graph_viewer/vector4.h \
+                   ../aislib/graph_viewer/primitives.h \
+                   ../aislib/graph_viewer/qgl_graph_viewer.h \
+                   ../aislib/math/angle.h \
+                   ../aislib/math/vector_n.h \
+                   ../aislib/math/quaternion.h \
+                   ../aislib/math/transformation.h \
+                   ../aislib/math/axis_angle.h \
+                   ../aislib/math/matrix_n.h \
+                   ../aislib/math/rotation_matrix.h \
+                   ../aislib/stuff/color_macros.h \
+                   ../aislib/stuff/macros.h \
+                   ../aislib/stuff/string_tools.h \
+                   ../aislib/stuff/os_specific.h \
+                   ../aislib/stuff/filesys_tools.h \
+                   ../aislib/stuff/array_allocator.h \
+                   ../aislib/stuff/runtime_error.h \
+                   main.txt \
+
+IMAGE_PATH     = ./
+
+STRIP_FROM_PATH    	= ../
+WARNINGS         	= NO
+PERL_PATH        	= /usr/bin/perl
+SEARCHENGINE     	= NO
+OPTIMIZE_OUTPUT_FOR_C 	= NO
+GENERATE_TREEVIEW 	= YES
+TREEVIEW_WIDTH 		= 280
+SOURCE_BROWSER    	= YES
+GENERATE_LATEX 		= NO
+
+ALPHABETICAL_INDEX 	= NO
+DISABLE_INDEX      	= YES
+
+ALWAYS_DETAILED_SEC	= NO
+REPEAT_BRIEF		= YES
+
+DETAILS_AT_TOP          = YES
+EXTRACT_ALL             = NO
+EXTRACT_LOCAL_CLASSES   = YES
+SHOW_INCLUDE_FILES      = NO
+SUBGROUPING            	= NO
+
+REFERENCED_BY_RELATION = NO
+REFERENCES_RELATION    = NO
+TOC_EXPAND             = YES
+
+HAVE_DOT               = YES
+CLASS_DIAGRAMS         = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+UML_LOOK               = NO
+
+TEMPLATE_RELATIONS     = YES

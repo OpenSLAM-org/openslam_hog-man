@@ -1,0 +1,17 @@
+#!/bin/tcsh
+
+set CC=gcc
+echo decompressing file $1
+
+set FILELIST=`ar -t $1`
+echo "Object files:"
+foreach i ($FILELIST)
+	echo $i
+end
+
+echo generating $2:r.so
+
+ar -x $1
+$CC -shared -o $2:r.so $FILELIST
+
+rm $FILELIST

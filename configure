@@ -1,0 +1,124 @@
+#!/bin/bash
+#if [ "$UID" = 0 ]; then echo "Please don't run configure as root"; exit 1; fi
+
+# prefix for the library name
+LIB_PREFIX=hogman_
+
+LINUX=1
+WINDOWS=0
+CPPFLAGS=-DLINUX
+CXXFLAGS=-fPIC
+CCFLAGS=-fPIC
+
+if [ ! $CXX ]; then
+	echo "No 'CXX' environment variable found, using g++.";
+	CXX="g++"
+fi
+
+if [ ! $CC ]; then
+	echo "No 'CC' environment variable found, using gcc.";
+	CC="gcc"
+fi
+
+if [ ! -x `which $CXX` ]; then
+	echo "Can't execute C++ compiler '$CXX'.";
+	exit 1;
+else	
+	echo "Using C++ compiler: $CXX"
+fi
+
+if [ ! -x `which $CC` ]; then
+	echo "Can't execute C++ compiler '$CC'.";
+	exit 1;
+else	
+	echo "Using C compiler: $CC"
+fi
+
+GCC_VERSION=`$CXX --version`
+
+echo -n "Checking for Qt 4.x ... "
+if [ -f /etc/debian_version ]; then
+  echo "found Debian (or Ubuntu) distribution"
+  QT_LIB="-L/usr/share/qt4/lib/ -lQtCore -lQtGui -lQtDesigner -lQtOpenGL -lQtXml"
+  QT_INCLUDE="-I/usr/include/qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtOpenGL"
+  MOC=/usr/bin/moc-qt4
+  UIC=/usr/bin/uic-qt4
+elif [ -f /etc/SuSE-release ]; then
+  echo "found SuSE distribution"
+  QT_LIB="-L/usr/lib/ -lQtCore -lQtGui -lQtDesigner -lQtOpenGL -lQtXml"
+  QT_INCLUDE="-I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtOpenGL -I/usr/include/QtXml"
+  MOC=/usr/bin/moc
+  UIC=/usr/bin/uic
+else
+  echo "I have no idea about your QT4 locations..."
+fi
+echo "done."
+
+ROOTDIR=`pwd`
+
+BINDIR=$ROOTDIR/bin
+echo -n "Checking bin directory $BINDIR ... "
+if [ ! -d $BINDIR ]; then
+	mkdir $BINDIR
+	echo "created."
+else
+	echo "Ok."
+fi
+
+LIBDIR=$ROOTDIR/lib
+echo -n "Checking lib directory $LIBDIR ... "
+if [ ! -d $LIBDIR ]; then
+	mkdir $LIBDIR
+	echo "created."
+else
+	echo "Ok."
+fi
+
+CONFIG=global.mk
+rm -f $CONFIG
+
+cat << EOF > $CONFIG
+
+### You should not need to change anything below.
+LINUX=$LINUX
+
+# Compilers
+CC=$CC
+CXX=$CXX
+
+# prefix for the library name
+LIB_PREFIX=$LIB_PREFIX
+
+# Paths
+ROOTDIR=$ROOTDIR
+LIBDIR=$LIBDIR
+BINDIR=$BINDIR
+
+# Build tools
+PRETTY=$ROOTDIR/build_tools/pretty_compiler
+MESSAGE=$ROOTDIR/build_tools/message
+TESTLIB=$ROOTDIR/build_tools/testlib
+
+# Generic makefiles
+MAKEFILE_GENERIC=$ROOTDIR/build_tools/Makefile.generic-shared-object
+MAKEFILE_APP=$ROOTDIR/build_tools/Makefile.app
+MAKEFILE_SUBDIRS=$ROOTDIR/build_tools/Makefile.subdirs
+
+# Flags
+CPPFLAGS+=$CPPFLAGS -I$ROOTDIR $CARMENFLAG 
+CXXFLAGS+=$CXXFLAGS
+LDFLAGS+=$LDFLAGS
+CARMENSUPPORT=$CARMENSUPPORT
+
+# QT support
+MOC=$MOC
+UIC=$UIC
+QT_LIB=$QT_LIB
+QT_INCLUDE=$QT_INCLUDE
+
+$OTHER
+
+include $ROOTDIR/manual.mk
+
+EOF
+
