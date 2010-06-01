@@ -82,7 +82,6 @@ namespace AISNavigation{
     }
   };
 
-
   template < > 
   struct Gradient < PoseGraph2D >{
     typedef PoseGraph2D PG;
@@ -108,7 +107,7 @@ namespace AISNavigation{
       
       deij_dxj[0][0]= 1;  deij_dxj[0][1]= 0;    deij_dxj[0][2]= 0;
       deij_dxj[1][0]= 0;  deij_dxj[1][1]= 1;    deij_dxj[1][2]= 0;
-      deij_dxj[2][0]= 0;  deij_dxj[2][1]=0;    deij_dxj[2][2]= 1;
+      deij_dxj[2][0]= 0;  deij_dxj[2][1]=0;     deij_dxj[2][2]= 1;
     }
 
   };
@@ -123,9 +122,11 @@ namespace AISNavigation{
       taylorTerms(fij, deij_dxi, deij_dxj, e);
       PG::TransformationType rmean=e.mean(false);
       eij=(rmean*fij).toVector();
-      deij_dxi=(rmean.toMatrix())*deij_dxi;
-      deij_dxj=(rmean.toMatrix())*deij_dxj;
-
+      Matrix3 z=rmean.toMatrix();
+      z[0][2]=0;
+      z[1][2]=0;
+      deij_dxi = z * deij_dxi;
+      deij_dxj = z * deij_dxj;
     }
   };
 
@@ -139,9 +140,11 @@ namespace AISNavigation{
       taylorTerms(fij, deij_dxi, deij_dxj, e);
       PG::TransformationType rmean=e.mean(false);
       eij=(rmean*fij).toVector();
-      deij_dxi=(rmean.toMatrix())*deij_dxi;
-      deij_dxj=(rmean.toMatrix())*deij_dxj;
-      
+      Matrix3 z=rmean.toMatrix();
+      z[0][2]=0;
+      z[1][2]=0;
+      deij_dxi = z * deij_dxi;
+      deij_dxj = z * deij_dxj;
     }
   };
 
