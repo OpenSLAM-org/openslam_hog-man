@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'base_main_widget.ui'
+** Form generated from reading UI file 'base_main_widget.ui'
 **
-** Created: Tue Mar 9 12:02:51 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Wed Jun 30 19:58:18 2010
+**      by: Qt User Interface Compiler version 4.6.2
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_BASE_MAIN_WIDGET_H

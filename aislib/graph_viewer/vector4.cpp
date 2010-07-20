@@ -1,22 +1,6 @@
-// HOG-Man - Hierarchical Optimization for Pose Graphs on Manifolds
-// Copyright (C) 2010 G. Grisetti, R. Kümmerle, C. Stachniss
-//
-// This file is part of HOG-Man.
-// 
-// HOG-Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// HOG-Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with HOG-Man.  If not, see <http://www.gnu.org/licenses/>.
-
 #include "vector4.h"
+
+#include <aislib/stuff/macros.h>
 
 #include <cmath>
 #include <cstdlib>
@@ -59,10 +43,10 @@ Vector4& Vector4::operator=(const Vector4& other)
 
 bool Vector4::operator== (const Vector4& other) const
 {
-  if ((fabs(_data[0] - other[0]) < 1e-12) &&
-      (fabs(_data[1] - other[1]) < 1e-12) &&
-      (fabs(_data[2] - other[2]) < 1e-12) &&
-      (fabs(_data[3] - other[3]) < 1e-12))
+  if ((fabs(_data[0] - other[0]) < PREC) &&
+      (fabs(_data[1] - other[1]) < PREC) &&
+      (fabs(_data[2] - other[2]) < PREC) &&
+      (fabs(_data[3] - other[3]) < PREC))
     return true;
   return false;
 }

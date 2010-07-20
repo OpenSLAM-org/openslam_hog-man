@@ -1,31 +1,13 @@
-// HOG-Man - Hierarchical Optimization for Pose Graphs on Manifolds
-// Copyright (C) 2010 G. Grisetti, R. Kümmerle, C. Stachniss
-//
-// This file is part of HOG-Man.
-// 
-// HOG-Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// HOG-Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with HOG-Man.  If not, see <http://www.gnu.org/licenses/>.
-
 #include <iostream>
 #include <string>
 #include <cassert>
-#include <sstream>
 
-#include "aislib/graph/posegraph3d.h"
+#include <aislib/graph/posegraph3d.h>
+#include <aislib/graph/posegraph2d.h>
 #include "pose_graph_vis3d.h"
 #include "qgl_graph_viewer.h"
 #include "main_widget.h"
-
+#include <sstream>
 #include <qapplication.h>
 using namespace std;
 using namespace AISNavigation;
@@ -182,6 +164,36 @@ void* readStdinThread(void* arg)
   return 0;
 }
 
+void convert2DGraphTo3D(const PoseGraph2D& input, PoseGraph3D& output)
+{
+  Matrix6 I6 = Matrix6::eye(1.);
+  // adding all the vertices
+  for (PoseGraph2D::VertexIDMap::const_iterator it = input.vertices().begin(); it != input.vertices().end(); ++it) {
+    int id = it->first;
+    const Transformation2& p2d = static_cast<PoseGraph2D::Vertex*>(it->second)->transformation;
+    Transformation3 p3d(Vector3(p2d.translation().x(), p2d.translation().y(), 0.0), Quaternion(0.0, 0.0, p2d.rotation().angle()));
+    PoseGraph3D::Vertex* oVertex = output.addVertex(id, p3d, I6);
+    if (oVertex) {
+      oVertex->transformation = oVertex->localTransformation = p3d;
+    }
+  }
+  // adding all the edges
+  for (PoseGraph2D::EdgeSet::const_iterator it = input.edges().begin(); it != input.edges().end(); ++it) {
+    PoseGraph2D::Edge*   e_2d  = static_cast<PoseGraph2D::Edge*>(*it);
+    PoseGraph2D::Vertex* vi_2d = static_cast<PoseGraph2D::Vertex*>(e_2d->from());
+    PoseGraph2D::Vertex* vj_2d = static_cast<PoseGraph2D::Vertex*>(e_2d->to());
+    const Transformation2& t2d = e_2d->mean();
+
+    PoseGraph3D::Vertex* vi_3d = static_cast<PoseGraph3D::Vertex*>(output.vertex(vi_2d->id()));
+    PoseGraph3D::Vertex* vj_3d = static_cast<PoseGraph3D::Vertex*>(output.vertex(vj_2d->id()));
+    Transformation3 t3d(Vector3(t2d.translation().x(), t2d.translation().y(), 0.0), Quaternion(0.0, 0.0, t2d.rotation().angle()));
+    PoseGraph3D::Edge* e_3d = output.addEdge(vi_3d, vj_3d, t3d, I6);
+    if (!e_3d) {
+      cerr << __PRETTY_FUNCTION__ << ": Failure adding " << vi_2d->id() << " <-> " << vj_2d->id() << endl;
+    }
+  }
+}
+
 void printUsage(const char* progName)
 {
   cout << "Usage: " << progName << " [options]" << endl << endl;
@@ -231,15 +243,8 @@ int main(int argc, char** argv)
   viewer.graph.setHirarchy(&graphs[0].hirarchy);
   mw.show();
 
-  // start the thread that reads stdin
-  pthread_t thread1;
-  int thread_status = pthread_create( &thread1, NULL, readStdinThread, static_cast<void*>(&viewer.graph));
-  if (thread_status != 0) {
-    cerr << "unable to create stdin thread" << endl;
-  }
-
-  // just load a graph and display this graph
-  if (localFilename.size()) {
+  pthread_t stdinReadingThread;
+  if (localFilename.size()) { // just load a graph and display this graph
     cout << "Loading file " << localFilename << " ... " << flush;
     ifstream ifs(localFilename.c_str());
     if (!ifs) {
@@ -250,7 +255,23 @@ int main(int argc, char** argv)
       graphs[0].graph.load(ifs);
     else
       graphs[0].graph.loadBinary(ifs);
+    if (graphs[0].graph.vertices().size() == 0) {
+      cerr << "\ttrying to load 2D graph ..." << endl;
+      ifs.clear();
+      ifs.seekg(0, ios::beg);
+      PoseGraph2D auxGraph;
+      auxGraph.load(ifs);
+      if (auxGraph.vertices().size() > 0) { // now convert everything to 3D for displaying
+        convert2DGraphTo3D(auxGraph, graphs[0].graph);
+      }
+    }
     cout << "done." << endl;
+  } else {
+    // start the thread that reads stdin
+    int thread_status = pthread_create( &stdinReadingThread, NULL, readStdinThread, static_cast<void*>(&viewer.graph));
+    if (thread_status != 0) {
+      cerr << "unable to create stdin thread" << endl;
+    }
   }
 
   while (mw.isVisible()) {
