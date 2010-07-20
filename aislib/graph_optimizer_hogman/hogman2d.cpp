@@ -128,12 +128,28 @@ int main (int argc, char** argv){
     cerr << "filename \"" << filename << "\" not given";
     return 0;
   }
+
   if (! optimizer) {
     optimizer=new HCholOptimizer2D(numLevels, nodeDistance);
     optType=hchol;
   }
+
+  if (verbose && optType==hchol) {
+    cerr << "WARNING: " << endl;
+    cerr << "You selected the verbose option and the hogman mode" << endl;
+    cerr << "This does not make sense and I will ignore this option" <<endl; 
+    verbose = false;
+  }
+
+  if (optType==hchol && ! incremental) {
+    cerr << "WARNING: " << endl;
+    cerr << "You selected the batch mode for hogman." << endl;
+    cerr << "This version of HOGMAN is made for on-line operation, not for off-line."  << endl;
+    cerr << "This is an unsupported feature, and it will be slower than standard Cholesky."  << endl;
+  }
+
   optimizer->verbose()=false;
-  if (! incremental){
+  if (! incremental && optType!=hchol){
     optimizer->verbose()=verbose;
   }
   optimizer->guessOnEdges() = incremental;
@@ -255,6 +271,7 @@ int main (int argc, char** argv){
     gettimeofday(&te,0);
     cerr << "**** Optimization Done ****" << endl;
     double dts=(te.tv_sec-ts.tv_sec)+1e-6*(te.tv_usec-ts.tv_usec);
+    cerr << "# final chi=" << optimizer->chi2() << endl;
     cerr << "TOTAL TIME= " << dts << " s." << endl;
   }
 

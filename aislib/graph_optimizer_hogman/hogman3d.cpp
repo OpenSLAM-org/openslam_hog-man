@@ -144,6 +144,22 @@ int main(int argc, char** argv)
     optType = OPT_HCHOL;
   }
 
+  if (verbose && optType==OPT_HCHOL) {
+    cerr << "WARNING: " << endl;
+    cerr << "You selected the verbose option and the hogman mode" << endl;
+    cerr << "This does not make sense and I will ignore this option" <<endl; 
+    verbose = false;
+  }
+
+  if (optType==OPT_HCHOL && ! incremental) {
+    cerr << "WARNING: " << endl;
+    cerr << "You selected the batch mode for hogman." << endl;
+    cerr << "This version of HOGMAN is made for on-line operation, not for off-line."  << endl;
+    cerr << "This is an unsupported feature, and it will be slower than standard Cholesky."  << endl;
+    return 0;
+  }
+
+
   ifstream is(filename);
   if (!is) {
     cerr << "Error opening " << filename << endl;
@@ -274,8 +290,8 @@ int main(int argc, char** argv)
     gettimeofday(&te,0);
     cerr << "**** Optimization Done ****" << endl;
     double dts=(te.tv_sec-ts.tv_sec)+1e-6*(te.tv_usec-ts.tv_usec);
-    cerr << "TOTAL TIME= " << dts << " s." << endl;
     cerr << "# final chi=" << optimizer->chi2() << endl;
+    cerr << "TOTAL TIME= " << dts << " s." << endl;
   }
 
   if (outfilename) {
