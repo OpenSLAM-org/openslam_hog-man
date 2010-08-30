@@ -189,8 +189,10 @@ int main (int argc, char** argv){
   cerr << "# initial guess= " << guess << endl;
   cerr << "# useManifold=   " << useManifold << endl;
 
+
   struct timeval ts, te;
   if (incremental) {
+    //ofstream stat_fs("stat.dat");
     int vertexCount=0;
     optimizer->visualizeToStdout() = false;
     cerr << "# Loading Edges... ";
@@ -251,6 +253,11 @@ int main (int argc, char** argv){
 	    cerr << "nodes= " << optimizer->vertices().size() << "\t edges= " << optimizer->edges().size() << "\t chi2= " << optimizer->chi2() << "\t time= "
               << dts << "\t iterations= " << currentIt <<  "\t cumTime= " << cumTime << endl;
           }
+	  // stat_fs << "nodes= " << optimizer->vertices().size() 
+	  // 	  << " edges= " << optimizer->edges().size() 
+	  // 	  << " time= "  << dts 
+	  // 	  << " cumTime= "  << cumTime 
+	  // 	  << " chi2= " << optimizer->chi2() << endl;
 	  vertexCount=0;
 	}
 	if (gnuout && !(count % 10) ){
@@ -262,8 +269,8 @@ int main (int argc, char** argv){
 	freshlyOptimized=true;
 	it--;
       }
-    cerr << "nodes= " << optimizer->vertices().size() << "\t edges= " << optimizer->edges().size() << "\t chi2= " << optimizer->chi2() << " cumTime= " << cumTime << endl;
     }
+    cerr << "nodes= " << optimizer->vertices().size() << "\t edges= " << optimizer->edges().size() << "\t chi2= " << optimizer->chi2() << " cumTime= " << cumTime << endl;
 
   } else {
     optimizer->load(is);

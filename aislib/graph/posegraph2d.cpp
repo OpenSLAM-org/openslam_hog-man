@@ -114,12 +114,21 @@ namespace AISNavigation {
         const PoseGraph2D::Edge* e=dynamic_cast<const PoseGraph2D::Edge*>(*it);
         if (onlyMarked && !e->_mark)
           continue;
+	bool revertOnWrite=false;
+	if (e->from()->id()>e->to()->id())
+	  revertOnWrite=true;
         const PoseGraph2D::Vertex* v1=dynamic_cast<const PoseGraph2D::Vertex*>(e->from());
         const PoseGraph2D::Vertex* v2=dynamic_cast<const PoseGraph2D::Vertex*>(e->to());
         bool isLoop = abs(v1->id()-v2->id()) != 1;
         if (isLoop == writeLoopEdges) {
-          os << "EDGE2 " << v1->id() << " " << v2->id() << " ";
-          PoseGraph2D::TransformationVectorType p=e->mean().toVector();
+	  PoseGraph2D::TransformationVectorType p;
+	  if (revertOnWrite){
+	    os << "EDGE2 " << v2->id() << " " << v1->id() << " ";
+	    p=e->mean().inverse().toVector();
+	  } else {
+	    os << "EDGE2 " << v1->id() << " " << v2->id() << " ";
+	    p=e->mean().toVector();
+	  }
           os << p.x() << " " << p.y() << " " << p.z() << " ";
           os << e->information()[0][0] << " "
             << e->information()[0][1] << " "
