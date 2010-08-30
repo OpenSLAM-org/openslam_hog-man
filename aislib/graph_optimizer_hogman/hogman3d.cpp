@@ -47,6 +47,7 @@ static const char * banner[]={
   "                              cholesky",
   " -i <int>                   sets the maximum number of iterations (default 10)",
   " -batch                     if toggled, the file is processed in offline mode",
+  " -update <int>              updates the estimate every x nodes (default 10)",
   " -v                         enables the verbose mode of the optimizer",
   " -guiout                    dumps the output to be piped into graph_viewer",
   " -guess                     perform initial guess (batch mode)",
@@ -95,7 +96,7 @@ int main(int argc, char** argv)
   bool incremental = true;
   bool guess = 0;
   int optType = OPT_CHOL;
-  int updateGraphEachN = 1;
+  int updateGraphEachN = 10;
   int updateVisualizationEachN = 25;
   char* filename = 0;
   char* gnudump = 0;
@@ -116,6 +117,9 @@ int main(int argc, char** argv)
       verbose=true;
     } else if (! strcmp(argv[c],"-batch")){
       incremental = false;
+    } else if (! strcmp(argv[c],"-update")){
+      c++;
+      updateGraphEachN = atoi(argv[c]);
     } else if (! strcmp(argv[c],"-guiout")){
       visualize = true;
     } else if (! strcmp(argv[c],"-o")){
@@ -169,6 +173,7 @@ int main(int argc, char** argv)
   cerr << "# Optimizer started, Parameter summary:" << endl;
   cerr << "# strategy=      " << optimizer2string(optType) << endl;
   cerr << "# verbose=       " << verbose << endl;
+  cerr << "# update=       " <<  updateGraphEachN << endl;
   cerr << "# iterations=    " << iterations << endl;
   cerr << "# verbose=       " << verbose << endl;
   cerr << "# outfile=       " << ((outfilename)? outfilename : "not set") << endl;
@@ -182,6 +187,7 @@ int main(int argc, char** argv)
   optimizer->guessOnEdges() = incremental;
 
   if (incremental) {
+    int vertexCount=0;
     optimizer->visualizeToStdout() = false;
     optimizer->verbose() = false;
 
@@ -217,12 +223,14 @@ int main(int argc, char** argv)
         //cerr << " adding vertex " << it->id1 << endl;
         v1 = optimizer->addVertex(it->id1, Transformation3(), Matrix6::eye(1.0));
         assert(v1);
+	vertexCount++;
       }
 
       if (! v2 && addNextEdge) {
         //cerr << " adding vertex " << it->id2 << endl;
         v2 = optimizer->addVertex(it->id2, Transformation3(), Matrix6::eye(1.0));
         assert(v2);
+	vertexCount++;
       }
 
       if (addNextEdge){
@@ -233,9 +241,10 @@ int main(int argc, char** argv)
       freshlyOptimized=false;
       if (optimize){
         //cerr << "Optimize" << endl;
-        if (!(count % updateGraphEachN)){
+        if (vertexCount >= updateGraphEachN){
           gettimeofday(&ts, 0);
           int currentIt=optimizer->optimize(iterations, true);
+	  
           gettimeofday(&te,0);
           double dts=(te.tv_sec-ts.tv_sec)+1e-6*(te.tv_usec-ts.tv_usec);
           cumTime += dts;
@@ -245,7 +254,8 @@ int main(int argc, char** argv)
             cerr << "nodes= " << optimizer->vertices().size() << "\t edges= " << optimizer->edges().size() << "\t chi2= " << chi2
               << "\t time= " << dts << "\t iterations= " << currentIt <<  "\t cumTime= " << cumTime << endl;
           }
-        }
+	  vertexCount=0;
+    }
 
         // update visualization
         if (visualize && !(count % updateVisualizationEachN) ) {

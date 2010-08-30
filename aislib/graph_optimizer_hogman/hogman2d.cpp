@@ -49,6 +49,7 @@ const char * banner[]={
   "                              cholesky",
   " -nomanifold                disables the manifold",
   " -i <int>                   sets the maximum number of iterations (default 10)",
+  " -update <int>              updates the estimate every x nodes (default 10)",
   " -batch                     if toggled, the file is processed in offline mode",
   " -v                         enables the verbose mode of the optimizer",
   " -gnuout                    dumps the output to be piped into gnuplot",
@@ -89,6 +90,7 @@ int main (int argc, char** argv){
   bool guess = false;
   int numLevels = 3;
   int nodeDistance = 2;
+  int updateGraphEachN = 10;
   int c=1;
   while(c<argc){
     if (! strcmp(argv[c],"-chol")){
@@ -111,6 +113,9 @@ int main (int argc, char** argv){
     } else if (! strcmp(argv[c],"-gnudump")){
       c++;
       gnudump=argv[c];
+    } else if (! strcmp(argv[c],"-update")){
+      c++;
+      updateGraphEachN = atoi(argv[c]);
     } else if (! strcmp(argv[c],"-i")){
       c++;
       iterations=atoi(argv[c]);
@@ -177,15 +182,16 @@ int main (int argc, char** argv){
   cerr << "# verbose=       " << verbose << endl;
   cerr << "# iterations=    " << iterations << endl;
   cerr << "# verbose=       " << verbose << endl;
+  cerr << "# update=       " <<  updateGraphEachN << endl;
   cerr << "# outfile=       " << ((outfilename)? outfilename : "not set") << endl;
   cerr << "# infile=        " << ((filename)? filename : "not set") << endl;
   cerr << "# incemental=    " << incremental << endl;
   cerr << "# initial guess= " << guess << endl;
   cerr << "# useManifold=   " << useManifold << endl;
 
-
   struct timeval ts, te;
   if (incremental) {
+    int vertexCount=0;
     optimizer->visualizeToStdout() = false;
     cerr << "# Loading Edges... ";
     LoadedEdgeSet loadedEdges;
@@ -216,6 +222,7 @@ int main (int argc, char** argv){
 	//cerr << " adding vertex " << it->id1 << endl;
 	v1=optimizer->addVertex(it->id1,Transformation2(), Matrix3::eye(1.));
 	assert(v1);
+	vertexCount++;
       }
     
       PoseGraph2D::Vertex* v2=optimizer->vertex(it->id2);
@@ -223,6 +230,7 @@ int main (int argc, char** argv){
 	//cerr << " adding vertex " << it->id2 << endl;
 	v2=optimizer->addVertex(it->id2, Transformation2(), Matrix3::eye(1.));
 	assert(v2);
+	vertexCount++;
       }
       
       if (addNextEdge){
@@ -233,16 +241,17 @@ int main (int argc, char** argv){
       freshlyOptimized=false;
       if (optimize){
 	//cerr << "Optimize" << endl;
-	if (!(count%1)){
+	if (vertexCount >= updateGraphEachN){
 	  gettimeofday(&ts,0);
 	  int currentIt=optimizer->optimize(iterations,true);
 	  gettimeofday(&te,0);
 	  double dts=(te.tv_sec-ts.tv_sec)+1e-6*(te.tv_usec-ts.tv_usec);
 	  cumTime += dts;
-	  if (verbose) {
+	  if (verbose){
 	    cerr << "nodes= " << optimizer->vertices().size() << "\t edges= " << optimizer->edges().size() << "\t chi2= " << optimizer->chi2() << "\t time= "
               << dts << "\t iterations= " << currentIt <<  "\t cumTime= " << cumTime << endl;
           }
+	  vertexCount=0;
 	}
 	if (gnuout && !(count % 10) ){
           optimizer->visualizeToStream(cout);
@@ -253,6 +262,7 @@ int main (int argc, char** argv){
 	freshlyOptimized=true;
 	it--;
       }
+    cerr << "nodes= " << optimizer->vertices().size() << "\t edges= " << optimizer->edges().size() << "\t chi2= " << optimizer->chi2() << " cumTime= " << cumTime << endl;
     }
 
   } else {
