@@ -73,6 +73,7 @@ if [ ! -d $LIBDIR ]; then
 else
 	echo "Ok."
 fi
+LDFLAGS+=" -Wl,-rpath,$LIBDIR"
 
 CONFIG=global.mk
 rm -f $CONFIG
