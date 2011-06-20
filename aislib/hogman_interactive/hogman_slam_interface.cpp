@@ -186,6 +186,8 @@ bool HogmanSlamInterface::solveState()
     int iterations = 1;
     if (_optimizer) {
       _optimizer->optimize(iterations, true);
+    } else if (_optimizer3D) {
+      _optimizer3D->optimize(iterations, true);
     }
     _firstOptimization = false;
     _nodesAdded = 0;
