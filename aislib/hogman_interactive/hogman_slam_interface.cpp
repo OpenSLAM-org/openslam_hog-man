@@ -26,7 +26,7 @@ namespace AISNavigation {
 static char buffer[10000]; // that should be more than enough
 
 HogmanSlamInterface::HogmanSlamInterface() :
-  _optimizer(0), _optimizer3D(0), _firstOptimization(true), _nodesAdded(0), _updateGraphEachN(1),
+  _optimizer(0), _optimizer3D(0), _firstOptimization(true), _nodesAdded(0), _updateGraphEachN(10),
   _initSolverDone(false)
 {
 }
@@ -37,7 +37,7 @@ bool HogmanSlamInterface::addNode(const std::string& tag, int id, int dimension,
   if (! _initSolverDone) {
     _initSolverDone = true;
     int numLevels = 2;
-    int nodeDistance = 3;
+    int nodeDistance = 5;
     cerr << __PRETTY_FUNCTION__ << " dimension " << dimension << " " << values.size() << endl;
     if (dimension == 3) {
       _optimizer = new HCholOptimizer2D(numLevels, nodeDistance);
