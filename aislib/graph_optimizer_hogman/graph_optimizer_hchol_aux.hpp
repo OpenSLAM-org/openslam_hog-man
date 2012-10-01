@@ -115,16 +115,16 @@ namespace AISNavigation{
       hFrom->taint();
     } else
       e=PG::addEdge(from, to, mean, information);
-    _cachedChi+=chi2(e);
+    _cachedChi+=this->chi2(e);
     return e;
   };
 
 
   template <typename PG>
   void HCholOptimizer<PG>::refineEdge(typename PG::Edge* e, const typename PG::TransformationType& mean, const typename PG::InformationType& information){
-    double derr=-chi2(e);
+    double derr=-this->chi2(e);
     PG::refineEdge(e,mean,information);
-    derr+=chi2(e);
+    derr+=this->chi2(e);
     _cachedChi+=derr;
   }
 
@@ -142,8 +142,8 @@ namespace AISNavigation{
       v2->taint();
     }
     typename PG::Edge* eAux = reinterpret_cast<typename PG::Edge*>(e);
-    _cachedChi-=chi2(eAux);
-    _lastOptChi-=chi2(eAux);
+    _cachedChi-=this->chi2(eAux);
+    _lastOptChi-=this->chi2(eAux);
     return Graph::removeEdge(e);
   }
   

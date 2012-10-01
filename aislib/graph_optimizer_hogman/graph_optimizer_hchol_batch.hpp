@@ -54,7 +54,7 @@ namespace AISNavigation{
       if (this->verbose())
 	cerr << "Optimizing the top level" << endl;
       HVertex* rootVertex=_MY_CAST_<HVertex*>(this->vertices().begin()->second);
-      initialize(rootVertex->id());
+      this->initialize(rootVertex->id());
       //ofstream oss("topLevel.graph");
       //save(oss);
       //oss.close();
@@ -62,7 +62,7 @@ namespace AISNavigation{
       for (Graph::VertexIDMap::const_iterator it=this->vertices().begin(); it!=this->vertices().end(); it++){
 	vset.insert(it->second);
       }
-      optimizeSubset(rootVertex, vset, iterations*3, lambda, true);
+      this->optimizeSubset(rootVertex, vset, iterations*3, lambda, true);
       if (this->verbose()) {
 	cerr << "Done";
 	//ofstream os("topLevel.dat");

@@ -117,6 +117,7 @@ UIC=$UIC
 QT_LIB=$QT_LIB
 QT_INCLUDE=$QT_INCLUDE
 
+
 $OTHER
 
 include $ROOTDIR/manual.mk

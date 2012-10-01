@@ -76,8 +76,8 @@ namespace AISNavigation{
   void HCholOptimizer<PG>::propagateDownIncremental(HVertex* to, double lambda){
     if (! _lowerOptimizer)
       return;
-    transformSubset(to->lowerRoot(), *(Graph::VertexSet*)(&to->children()),to->transformation);
-    optimizeSubset(to->lowerRoot(),  *(Graph::VertexSet*)(&to->children()), _downIncrementalIterations, lambda, false);
+    this->transformSubset(to->lowerRoot(), *(Graph::VertexSet*)(&to->children()),to->transformation);
+    this->optimizeSubset(to->lowerRoot(),  *(Graph::VertexSet*)(&to->children()), _downIncrementalIterations, lambda, false);
     for (typename HVertexSet::iterator it=to->children().begin(); it!=to->children().end(); it++){
       HVertex* v=*it;
       _lowerOptimizer->propagateDownIncremental(v,lambda);
@@ -104,9 +104,9 @@ namespace AISNavigation{
 	for(typename HVertexSet::iterator ft=pv->children().begin(); ft!=pv->children().end(); ft++){
 	  region.insert(*ft);
 	}
-	transformSubset(pv->lowerRoot(), *(Graph::VertexSet*)(&pv->children()), pv->transformation);
+	this->transformSubset(pv->lowerRoot(), *(Graph::VertexSet*)(&pv->children()), pv->transformation);
       }
-      optimizeSubset(toParent->lowerRoot(), region, _downIncrementalIterations, 1., false);
+      this->optimizeSubset(toParent->lowerRoot(), region, _downIncrementalIterations, 1., false);
     }
   }
 
@@ -155,7 +155,7 @@ namespace AISNavigation{
             maxRot = fabs(pdeltaRot[i]);
       if (maxTrans < _translationalPropagationError && maxRot < _rotationalPropagationError)
 	continue;
-      transformSubset(parentVertex->lowerRoot(), *(Graph::VertexSet*)(&parentVertex->children()), parentVertex->transformation);
+      this->transformSubset(parentVertex->lowerRoot(), *(Graph::VertexSet*)(&parentVertex->children()), parentVertex->transformation);
       touched+=parentVertex->children().size();
       changed.insert(parentVertex);
     }
@@ -163,7 +163,7 @@ namespace AISNavigation{
     if (propagateDown){
       for (typename HVertexSet::iterator it=changed.begin(); it!=changed.end(); it++){
 	HVertex* parentVertex=*it;
-	optimizeSubset(parentVertex->lowerRoot(), *(Graph::VertexSet*)(&parentVertex->children()), _downIncrementalIterations, 1., false);
+	this->optimizeSubset(parentVertex->lowerRoot(), *(Graph::VertexSet*)(&parentVertex->children()), _downIncrementalIterations, 1., false);
       } 
     }
     return true;
@@ -366,7 +366,7 @@ namespace AISNavigation{
 	  HVertex* pv1=cv1->parentVertex();
 	  HVertex* pv2=cv2->parentVertex();
 	  assert(pv1 && pv2 && (pv1==hv || pv2==hv) );
-	  if (pv1!=pv2 && connectingEdges(pv1,pv2).empty() && connectingEdges(pv2,pv1).empty()){
+	  if (pv1!=pv2 && this->connectingEdges(pv1,pv2).empty() && this->connectingEdges(pv2,pv1).empty()){
 	    typename PG::InformationType info = PG::InformationType::eye(1.);
             int rotDim = PG::TransformationType::RotationType::Dimension;
             assert(rotDim + PG::TransformationType::RotationType::Angles == info.rows());

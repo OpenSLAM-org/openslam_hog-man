@@ -26,6 +26,7 @@
  * \brief draw primitives with OpenGL
  */
 
+#include <GL/glu.h>
 #include <qgl.h>
 #include <cmath>
 

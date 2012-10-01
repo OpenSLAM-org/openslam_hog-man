@@ -18,6 +18,7 @@
 #include <queue>
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 //#include "posegraph2d.hh"
 
 #define LINESIZE (4096*4)
@@ -127,7 +128,7 @@ namespace AISNavigation{
   double PoseGraph<T,I>::PathLengthCostFunction::operator()(Graph::Edge* edge, Graph::Vertex* from, Graph::Vertex* to){
     const typename PoseGraph<T,I>::Edge* e=dynamic_cast<const typename PoseGraph<T,I>::Edge*>(edge);
     typename T::TranslationType t=e->mean().translation();
-    return sqrt(t*t);
+    return std::sqrt(t*t);
   }
 
   template <typename T, typename I>

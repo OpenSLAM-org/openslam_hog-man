@@ -29,9 +29,9 @@ namespace AISNavigation{
 
   template <typename PG>
   bool CholOptimizer<PG>::initialize(int rootNode){
-    if (verbose())
+    if (this->verbose())
       cerr << "# init " << rootNode << endl;
-    if (vertex(rootNode)){
+    if (this->vertex(rootNode)){
       _rootNode=rootNode;
       return true;
     }
@@ -44,14 +44,14 @@ namespace AISNavigation{
   template <typename PG>
   int CholOptimizer<PG>::optimize(int iterations, bool online){
     Graph::VertexSet vset;
-    for (Graph::VertexIDMap::const_iterator it=vertices().begin(); it!=vertices().end(); it++){
+    for (Graph::VertexIDMap::const_iterator it=this->vertices().begin(); it!=this->vertices().end(); it++){
       vset.insert(it->second);
     }
     
-    typename PG::Vertex* root=dynamic_cast<typename PG::Vertex*>(vertex(_rootNode));
+    typename PG::Vertex* root=dynamic_cast<typename PG::Vertex*>(this->vertex(_rootNode));
     if (! root)
-      root=_MY_CAST_<typename PG::Vertex*>(vertices().begin()->second);
-    if (verbose())
+      root=_MY_CAST_<typename PG::Vertex*>(this->vertices().begin()->second);
+    if (this->verbose())
       cerr << "# root id " << root->id() << endl;
     bool initFromObservations = _guessOnEdges;
     optimizeSubset(root, vset, iterations, 0., initFromObservations);
@@ -93,7 +93,7 @@ namespace AISNavigation{
 
     if (initFromObservations){
       initializeActiveSubsetWithObservations(rootVertex);
-      if (verbose()){
+      if (this->verbose()){
         cerr << "iteration= " << -1 
           << "\t chi2= " << this->chi2() 
           << "\t time= " << 0.0
@@ -126,7 +126,7 @@ namespace AISNavigation{
 	double** pblock = new double*[dim];
         for (int k = 0; k < dim; ++k)
           pblock[k] = (*otherCovariance)[k];
-	typename PG::Vertex* otherVertex=_MY_CAST_<typename PG::Vertex*>(vertex(otherNode));
+	typename PG::Vertex* otherVertex=_MY_CAST_<typename PG::Vertex*>(this->vertex(otherNode));
 	int j=otherVertex->tempIndex()*dim;
 	solveAndUpdate(pblock, j,j,j+dim,j+dim);
         static TransformCovariance<PG> tCov;
@@ -136,7 +136,7 @@ namespace AISNavigation{
       gettimeofday(&te,0);
       double dts=(te.tv_sec-ts.tv_sec)+1e-6*(te.tv_usec-ts.tv_usec);
       cumTime+=dts;
-      if (verbose()){
+      if (this->verbose()){
         cerr << "iteration= " << i 
           << "\t chi2= " << this->chi2() 
           << "\t time= " << dts 
@@ -270,8 +270,8 @@ namespace AISNavigation{
 
   template <typename PG>
   typename PG::Edge* CholOptimizer<PG>::addEdge(typename PG::Vertex* from, typename PG::Vertex* to, const typename PG::TransformationType& mean, const typename PG::InformationType& information){
-    Graph::EdgeSet eset1=connectingEdges(from, to);
-    Graph::EdgeSet eset2=connectingEdges(to, from);
+    Graph::EdgeSet eset1=this->connectingEdges(from, to);
+    Graph::EdgeSet eset2=this->connectingEdges(to, from);
     Graph::EdgeSet eset;
     std::set_union(eset1.begin(),
 		   eset1.end(),
@@ -338,7 +338,7 @@ namespace AISNavigation{
     origFrom->restore();
     origTo->restore();
 
-    if (0 && verbose()) {
+    if (0 && this->verbose()) {
       cerr << CL_GREEN(__PRETTY_FUNCTION__ << ": updating old edge with new measurement") << endl;
       cerr << "old mean: " << origEdge->mean().toVector() << endl;
       cerr << "new mean: " << (to==origTo ? mean.toVector() : mean.inverse().toVector()) << endl;
@@ -348,7 +348,7 @@ namespace AISNavigation{
       cerr << " -> information:\n" << newInfo << endl;
     }
 
-    refineEdge(origEdge, newMean, newInfo);
+    this->refineEdge(origEdge, newMean, newInfo);
     return origEdge;
 
   }
@@ -575,7 +575,7 @@ namespace AISNavigation{
     }
     ActivePathUniformCostFunction<PG> apl(this);
     dv.shortestPaths(root,&apl,maxDistance);
-    propagateAlongDijkstraTree(root, dv.adjacencyMap(), false, true); 
+    this->propagateAlongDijkstraTree(root, dv.adjacencyMap(), false, true); 
     for (typename std::set<typename PG::Edge*>::iterator it=_activeEdges.begin(); it!=_activeEdges.end(); it++){
       typename PG::Vertex* from=static_cast<typename PG::Vertex*>((*it)->from());
       typename PG::Vertex* to=static_cast<typename PG::Vertex*>((*it)->to());
